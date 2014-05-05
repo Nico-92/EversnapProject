@@ -1,0 +1,39 @@
+<div class="header">
+	<h3 class="text-muted">Eversnap project</h3>
+	<fb:login-button scope="public_profile,email, user_photos" onlogin="login();" ng-if="!loggedIn"></fb:login-button>
+	<button ng-click="logout();" class="btn" ng-if="loggedIn">Logout</button>
+  	
+</div>
+<div ng-show="!loggedIn">
+<div class="alert alert-warning"><span class="glyphicon glyphicon-arrow-up"> You must be logged to access the page's contents</span></div>
+</div>
+<div ng-if="loggedIn">
+	<tabset justified="true">
+    <tab heading="Albums" select="prova();">{{album}}
+    	<div class="panel panel-default">
+		  <!-- Default panel contents -->
+			<div class="panel-heading">Albums</div>
+
+		  <!-- Table -->
+			<table class="table">
+		   		<tbody ng-repeat="album in albums">
+		   			<tr><td><button class="btn btn-link" ng-click="loadPhoto(album.id)">{{album.name}}</button><h5><small>{{album.count}} foto</small></h5></td><td></td></tr>
+		   		</tbody>
+			</table>
+		</div>
+		
+
+	</tab>
+    <tab heading="Photo" active="isActive">
+    	<table class="table">
+		   		<tbody ng-repeat="photo in photos">
+		   			<tr><td><img src="{{photo.picture}}" /></td></tr>
+		   		</tbody>
+		</table>
+	</tab>
+  	</tabset>
+</div>
+
+<div class="footer">
+  	<p><span class="glyphicon glyphicon-heart"></span> from the Yeoman team</p>
+</div>
