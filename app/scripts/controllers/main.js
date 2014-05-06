@@ -2,17 +2,13 @@
 
 angular.module('eversnapApp')
   .controller('MainCtrl', ['$scope', "$rootScope", '$modal', 'Facebook', function ($scope, $rootScope, $modal, Facebook) {
-    $scope.awesome = 'aaa';
     $scope.loggedIn = undefined;
-    $scope.user = undefined;
-    $scope.albums = undefined;
-    $scope.photo = undefined;
-
+    $scope.isError = { active: 'false', message: ''};
 
     $scope.$watch(function() {
     	return Facebook.isReady(); 
   	}, function(newVal) {
-    $scope.facebookReady = true;
+    	$scope.facebookReady = true;
   	});
 
 	$scope.getLoginStatus = function() {
@@ -31,52 +27,43 @@ angular.module('eversnapApp')
       		}
 	    })
     };
+    /* When I load the page I call getLoginStatus() to initialize loggedIn, user and albums */
+    $scope.getLoginStatus();
+	
 
-	$scope.getLoginStatus();
-
-
+    /* Logout API take care to logout user, then I set loggedIn to false*/ 
     $scope.logout = function() {
     	Facebook.logout(function(response){
     		$scope.loggedIn = false;
     	})
     };
+
+    /* The onlogin facebook's function must be on window scope to work*/
     window.login = function() { 
     	$scope.getLoginStatus();
     };
 
-    $scope.me = function() {
-      Facebook.api('/user.accessToken', function(response) {
-        $scope.$apply(function() {
-          // Here you could re-check for user status (just in case)
-          $scope.user = response;
-        });
-      });
-    };
-
-     //$scope.me();
+    /* Loads the albums */
     $scope.albums = function(){
     	Facebook.api(
 	    '/me/albums',
 	    function (response) {
 	    	if (response && !response.error) {
 	    		$scope.albums = response.data;
-	    		//console.log(response.data);
-	    	// 	for (var album in response.data) {
-	    	// 		Facebook.api('/'+response.data[album].id + '/picture', 
-	    	// 			function(coverResponse) {
-	    	// 				$scope.albums[album].cover_photo = coverResponse.data.url;
-      //   				}
-      //   			);
-	    	// 	}
-	    	// 	$scope.albums = response.data;
-	    	// 	console.log($scope.a);
+	    	}
+	    	else{
+	    		$scope.isError.active = true;
+	    		$scope.isError.message = response;
 	    	}
 	    })
     };
+
+    /* Manage the Albums and Photo tabs activations*/
     $scope.returnToAlbum = function(){
     	$scope.isActive = undefined;
     };
 
+    /* Loads the photo of an album, and change tab fromalbums to photos*/
     $scope.loadPhoto = function(albumId, albumName){
     	console.log(albumId);
     	Facebook.api(
@@ -87,67 +74,63 @@ angular.module('eversnapApp')
 	    		response.data.albumName = albumName;
 	    		$scope.photos = response.data;
 	    		
+	    	}else{
+	    		$scope.isError.active = true;
+	    		$scope.isError.message = response;
 	    	}
 	    	
 	    })
     };
 
-    $scope.prova = function(){
-    	alert();
-    }
-
+    /* Function of$modal service, open the bootstrap modal*/
     $scope.open = function (size, photoId) {
-    var modalInstance = $modal.open({
-      templateUrl: 'popup.html',
-      controller: ModalInstanceCtrl,
-      size: size,
-      resolve: {
-        items: function () {
-          return photoId;
-        }
-      }
-    });
-    modalInstance.result.then(function (selectedItem) {
-      $scope.selected = selectedItem;
-    }, function () {
-      //$log.info('Modal dismissed at: ' + new Date());
-    });
-  };
-    
-
-
-
-
+	    var modalInstance = $modal.open({
+	    	templateUrl: 'popup.html',
+	      	controller: ModalInstanceCtrl,
+	      	size: size,
+	      	resolve: {
+	        	photoId: function () {
+	          	return photoId;
+	        	}
+	    	}
+	    });
+  	};
 
   }]);
-var ModalInstanceCtrl = function ($scope, $modalInstance, items, Facebook) {
+
+
+
+var ModalInstanceCtrl = function ($scope, $modalInstance, photoId, Facebook) {
+	/* Retrieve photo info*/
 	Facebook.api(
-    '/'+items,
+    '/'+photoId,
     function (response) {
 	    if (response && !response.error) {
 	        $scope.photo = response;
 	    }  
     }
 	);
+	/* Retrieve photo likes*/
 	Facebook.api(
-    '/'+items+'/likes',
+    '/'+photoId+'/likes',
     function (response) {
 	    if (response && !response.error) {
 	        $scope.likes = response.data;
 	    }  
     }
 	);
+	/* Retrieve photo comments */
 	Facebook.api(
-    '/'+items+'/comments',
+    '/'+photoId+'/comments',
     function (response) {
-    	console.log(response.data);
 	    if (response && !response.error) {
 	        $scope.comments = response.data;
 	    }  
     }
 	);
 
-  $scope.cancel = function () {
-    $modalInstance.dismiss('cancel');
-  };
+	/* Close modal */
+	$scope.cancel = function () {
+    	$modalInstance.dismiss('cancel');
+  	};
 };

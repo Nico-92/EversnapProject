@@ -1,13 +1,13 @@
 <script type="text/ng-template" id="popup.html">
     <div class="modal-body container-fluid">
-    	<div class="container-fluid">	
+    	<div class="row clearfix">	
     		<div class="modal-header">
 		        <span class="glyphicon glyphicon-remove-circle clickable pull-right" ng-click="cancel()"><span>
        		</div>
-    		<div class="col-xs-8">
+    		<div class="col-md-8 column">
     			<img src="{{photo.source}}" class="img-responsive"/>
 			</div>
-			<div class="col-xs-4">
+			<div class="col-md-4 column">
 				
 				<h4><small ng-repeat="like in likes">
 
@@ -36,6 +36,7 @@
 	<div class="alert alert-warning"><span class="glyphicon glyphicon-arrow-up"> You must be logged to access the page's contents</span></div>
 </div>
 <div ng-if="loggedIn">
+	<div class="alert alert-danger" ng-if="isError.active">{{isError.message}}</div>
 	<tabset justified="true">
 	    <tab heading="Albums" select="returnToAlbum();">
 	    	<div class="panel panel-default">
@@ -48,7 +49,7 @@
 			
 
 		</tab>
-	    <tab heading="Photo" active="isActive" disabled="true">
+	    <tab heading="Photos" active="isActive" disabled="true">
 	    	<div class="panel panel-default">
 				<div class="panel-heading">
 					<h3 class="panel-title">{{photos.albumName}}</h3>
