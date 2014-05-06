@@ -1,11 +1,12 @@
 'use strict';
 
 angular.module('eversnapApp')
-  .controller('MainCtrl', ['$scope', "$rootScope", '$q', 'Facebook', function ($scope, $rootScope, $q, Facebook) {
+  .controller('MainCtrl', ['$scope', "$rootScope", '$q', '$modal', 'Facebook', function ($scope, $rootScope, $q, $modal, Facebook) {
     $scope.awesome = 'aaa';
     $scope.loggedIn = undefined;
     $scope.user = undefined;
     $scope.albums = undefined;
+    $scope.photo = undefined;
     //var deferred = $q.defer();
 
 
@@ -70,28 +71,49 @@ angular.module('eversnapApp')
 	    		$scope.albums = response.data;
 	    		//$scope.albumCover(response.data);
 	    	}
-	    	console.log(response.data);
 	    	//console.log(promise);
 	    })
     };
-    $scope.prova = function(val){
+    $scope.returnToAlbum = function(){
     	$scope.isActive = undefined;
-    }
+    };
 
-    $scope.loadPhoto = function(albumId){
+    $scope.loadPhoto = function(albumId, albumName){
     	console.log(albumId);
     	Facebook.api(
 	    '/'+albumId+'/photos',
 	    function (response) {
 	    	if (response && !response.error) {
 	    		$scope.isActive = true;
-	    		console.log(response.data);
+	    		response.data.albumName = albumName;
 	    		$scope.photos = response.data;
 	    		
 	    	}
 	    	
 	    })
     };
+
+    $scope.prova = function(){
+    	alert();
+    }
+
+    $scope.open = function (size, photoId) {
+    var modalInstance = $modal.open({
+      templateUrl: 'popup.html',
+      controller: ModalInstanceCtrl,
+      size: size,
+      resolve: {
+        items: function () {
+          return photoId;
+        }
+      }
+    });
+    modalInstance.result.then(function (selectedItem) {
+      $scope.selected = selectedItem;
+    }, function () {
+      //$log.info('Modal dismissed at: ' + new Date());
+    });
+  };
 
     // $scope.albumCover = function(newValue, albumsId, scope){
     // 	for(var i = 0; i<albumsId.length; i++){
@@ -113,3 +135,38 @@ angular.module('eversnapApp')
 
 
   }]);
+var ModalInstanceCtrl = function ($scope, $modalInstance, items, Facebook) {
+	Facebook.api(
+    '/'+items,
+    function (response) {
+	    if (response && !response.error) {
+	        $scope.photo = response;
+	    }  
+    }
+	);
+	Facebook.api(
+    '/'+items+'/likes',
+    function (response) {
+	    if (response && !response.error) {
+	        $scope.likes = response.data;
+	    }  
+    }
+	);
+	Facebook.api(
+    '/'+items+'/comments',
+    function (response) {
+    	console.log(response.data);
+	    if (response && !response.error) {
+	    	
+	        $scope.comments = response.data;
+	    }  
+    }
+	);
+  // $scope.ok = function () {
+  //   $modalInstance.close($scope.selected.item);
+  // };
+
+  $scope.cancel = function () {
+    $modalInstance.dismiss('cancel');
+  };
+};

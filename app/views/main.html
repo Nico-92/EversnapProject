@@ -1,3 +1,26 @@
+<script type="text/ng-template" id="popup.html">
+    <div class="modal-body">
+        <div class="pull-left"><img src="{{photo.source}}" /></div>
+        <div class="pull-right" style="backgroundcolor=red">
+        	<h2><small ng-repeat="like in likes">
+
+        		{{like.name}}
+
+        </small></h2>
+        <ul class="list-group" ng-repeat="comment in comments">
+					<li class="list-group-item"><b>{{comment.from.name}}:</b> {{comment.message}}</li>
+				</ul>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <!-- <button class="btn btn-primary" ng-click="ok()">OK</button> -->
+        <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+    </div>
+</script>
+
+
+
+
 <div class="header">
 	<h3 class="text-muted">Eversnap project</h3>
 	<fb:login-button scope="public_profile,email, user_photos" onlogin="login();" ng-if="!loggedIn"></fb:login-button>
@@ -9,27 +32,36 @@
 </div>
 <div ng-if="loggedIn">
 	<tabset justified="true">
-    <tab heading="Albums" select="prova();">{{album}}
+    <tab heading="Albums" select="returnToAlbum();">{{album}}
     	<div class="panel panel-default">
-		  <!-- Default panel contents -->
-			<div class="panel-heading">Albums</div>
 
 		  <!-- Table -->
 			<table class="table">
 		   		<tbody ng-repeat="album in albums">
-		   			<tr><td><button class="btn btn-link" ng-click="loadPhoto(album.id)">{{album.name}}</button><h5><small>{{album.count}} foto</small></h5></td><td></td></tr>
+		   			<tr><td><button class="btn btn-link" ng-click="loadPhoto(album.id, album.name)">{{album.name}}</button><h5><small>{{album.count}} foto</small></h5></td><td></td></tr>
 		   		</tbody>
 			</table>
 		</div>
 		
 
 	</tab>
-    <tab heading="Photo" active="isActive">
-    	<table class="table">
+    <tab heading="Photo" active="isActive" disabled="true">
+    	<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">{{photos.albumName}}</h3>
+			</div>
+			<div class="panel-body">
+				<span class="img-thumbnail" ng-repeat="(index, photo) in photos">
+		    		<img  src="{{photo.picture}}" ng-click="open('lg', photo.id)" class="clickable"/><br ng-if="($index+1)%5==0" />
+				</span> 
+			</div>
+		</div>
+    	
+    	<!--<table class="table">
 		   		<tbody ng-repeat="photo in photos">
-		   			<tr><td><img src="{{photo.picture}}" /></td></tr>
+		   			<tr ng-if="($index)%3==0"><td ng-if="true"><img src="{{photo.picture}}" /></td></tr>
 		   		</tbody>
-		</table>
+		</table> -->
 	</tab>
   	</tabset>
 </div>
