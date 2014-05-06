@@ -1,20 +1,25 @@
 <script type="text/ng-template" id="popup.html">
-    <div class="modal-body">
-        <div class="pull-left"><img src="{{photo.source}}" /></div>
-        <div class="pull-right" style="backgroundcolor=red">
-        	<h2><small ng-repeat="like in likes">
+    <div class="modal-body container-fluid">
+    	<div class="container-fluid">	
+    		<div class="modal-header">
+		        <span class="glyphicon glyphicon-remove-circle clickable pull-right" ng-click="cancel()"><span>
+       		</div>
+    		<div class="col-xs-8">
+    			<img src="{{photo.source}}" class="img-responsive"/>
+			</div>
+			<div class="col-xs-4">
+				
+				<h4><small ng-repeat="like in likes">
 
-        		{{like.name}}
+        		{{like.name}}<span ng-show="!$last">,</span>
 
-        </small></h2>
-        <ul class="list-group" ng-repeat="comment in comments">
-					<li class="list-group-item"><b>{{comment.from.name}}:</b> {{comment.message}}</li>
+		        </small><small class="likeColor" ng-if="likes!=0" >Like this</small></h4>
+		        <ul class="list-group" ng-repeat="comment in comments">
+					<li class="list-group-item"><strong>{{comment.from.name}}:</strong> {{comment.message}} <br /><small>{{comment.created_time | limitTo: 10}}</small></li>
 				</ul>
-        </div>
-    </div>
-    <div class="modal-footer">
-        <!-- <button class="btn btn-primary" ng-click="ok()">OK</button> -->
-        <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+				<span ng-if="comments==0">There is no comments</span>
+			</div>
+    	</div>
     </div>
 </script>
 
@@ -23,49 +28,42 @@
 
 <div class="header">
 	<h3 class="text-muted">Eversnap project</h3>
-	<fb:login-button scope="public_profile,email, user_photos" onlogin="login();" ng-if="!loggedIn"></fb:login-button>
-	<button ng-click="logout();" class="btn" ng-if="loggedIn">Logout</button>
+	<span ng-show="!loggedIn"><fb:login-button scope="public_profile,email, user_photos" onlogin="login();" ></fb:login-button></span>
+	<button ng-click="logout();" class="btn btn-default" ng-if="loggedIn">Logout</button>
   	
 </div>
 <div ng-show="!loggedIn">
-<div class="alert alert-warning"><span class="glyphicon glyphicon-arrow-up"> You must be logged to access the page's contents</span></div>
+	<div class="alert alert-warning"><span class="glyphicon glyphicon-arrow-up"> You must be logged to access the page's contents</span></div>
 </div>
 <div ng-if="loggedIn">
 	<tabset justified="true">
-    <tab heading="Albums" select="returnToAlbum();">{{album}}
-    	<div class="panel panel-default">
-
-		  <!-- Table -->
-			<table class="table">
-		   		<tbody ng-repeat="album in albums">
-		   			<tr><td><button class="btn btn-link" ng-click="loadPhoto(album.id, album.name)">{{album.name}}</button><h5><small>{{album.count}} foto</small></h5></td><td></td></tr>
-		   		</tbody>
-			</table>
-		</div>
-		
-
-	</tab>
-    <tab heading="Photo" active="isActive" disabled="true">
-    	<div class="panel panel-default">
-			<div class="panel-heading">
-				<h3 class="panel-title">{{photos.albumName}}</h3>
+	    <tab heading="Albums" select="returnToAlbum();">
+	    	<div class="panel panel-default">
+				<table class="table">
+			   		<tbody ng-repeat="album in albums">
+			   			<tr><td><img src="https://graph.facebook.com/{{album.id}}/picture?type=album&access_token={{user.authResponse.accessToken}}" class="img-responsive clickable" ng-click="loadPhoto(album.id, album.name)"/><button class="btn btn-link" ng-click="loadPhoto(album.id, album.name)">{{album.name}}</button><small>{{album.count}} foto </small></td><td></td></tr>
+			   		</tbody>
+				</table>
 			</div>
-			<div class="panel-body">
-				<span class="img-thumbnail" ng-repeat="(index, photo) in photos">
-		    		<img  src="{{photo.picture}}" ng-click="open('lg', photo.id)" class="clickable"/><br ng-if="($index+1)%5==0" />
-				</span> 
+			
+
+		</tab>
+	    <tab heading="Photo" active="isActive" disabled="true">
+	    	<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">{{photos.albumName}}</h3>
+				</div>
+				<div class="panel-body">
+					<span class="img-thumbnail" ng-repeat="(index, photo) in photos">
+			    		<img  src="{{photo.picture}}" ng-click="open('lg', photo.id)" class="clickable"/><br ng-if="($index+1)%5==0" />
+					</span> 
+				</div>
 			</div>
-		</div>
-    	
-    	<!--<table class="table">
-		   		<tbody ng-repeat="photo in photos">
-		   			<tr ng-if="($index)%3==0"><td ng-if="true"><img src="{{photo.picture}}" /></td></tr>
-		   		</tbody>
-		</table> -->
-	</tab>
+	    	
+		</tab>
   	</tabset>
 </div>
 
 <div class="footer">
-  	<p><span class="glyphicon glyphicon-heart"></span> from the Yeoman team</p>
+  	<p>With <span class="glyphicon glyphicon-heart"></span> from Nicolò</p>
 </div>

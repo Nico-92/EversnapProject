@@ -1,19 +1,18 @@
 'use strict';
 
 angular.module('eversnapApp')
-  .controller('MainCtrl', ['$scope', "$rootScope", '$q', '$modal', 'Facebook', function ($scope, $rootScope, $q, $modal, Facebook) {
+  .controller('MainCtrl', ['$scope', "$rootScope", '$modal', 'Facebook', function ($scope, $rootScope, $modal, Facebook) {
     $scope.awesome = 'aaa';
     $scope.loggedIn = undefined;
     $scope.user = undefined;
     $scope.albums = undefined;
     $scope.photo = undefined;
-    //var deferred = $q.defer();
 
 
     $scope.$watch(function() {
-    	return Facebook.isReady(); // This is for convenience, to notify if Facebook is loaded and ready to go.
+    	return Facebook.isReady(); 
   	}, function(newVal) {
-    $scope.facebookReady = true; // You might want to use this to disable/show/hide buttons and else
+    $scope.facebookReady = true;
   	});
 
 	$scope.getLoginStatus = function() {
@@ -38,7 +37,7 @@ angular.module('eversnapApp')
 
     $scope.logout = function() {
     	Facebook.logout(function(response){
-    		$scope.getLoginStatus();
+    		$scope.loggedIn = false;
     	})
     };
     window.login = function() { 
@@ -57,21 +56,21 @@ angular.module('eversnapApp')
      //$scope.me();
     $scope.albums = function(){
     	Facebook.api(
-	    "/me/albums",
+	    '/me/albums',
 	    function (response) {
 	    	if (response && !response.error) {
-	    		//var promise = deferred.promise.then($scope.albumCover);
-	    		 //for(var i = 0; i<response.data.length; i++){
-	    		//  	console.log('aaa');
-	    		//  	deferred.resolve(response.data[i].cover_photo);
-	    		//  	$rootScope.$apply();
-	    			//$scope.albumCover(response.data[i].id,i);
-	    		 //}
-	    		
 	    		$scope.albums = response.data;
-	    		//$scope.albumCover(response.data);
+	    		//console.log(response.data);
+	    	// 	for (var album in response.data) {
+	    	// 		Facebook.api('/'+response.data[album].id + '/picture', 
+	    	// 			function(coverResponse) {
+	    	// 				$scope.albums[album].cover_photo = coverResponse.data.url;
+      //   				}
+      //   			);
+	    	// 	}
+	    	// 	$scope.albums = response.data;
+	    	// 	console.log($scope.a);
 	    	}
-	    	//console.log(promise);
 	    })
     };
     $scope.returnToAlbum = function(){
@@ -114,20 +113,6 @@ angular.module('eversnapApp')
       //$log.info('Modal dismissed at: ' + new Date());
     });
   };
-
-    // $scope.albumCover = function(newValue, albumsId, scope){
-    // 	for(var i = 0; i<albumsId.length; i++){
-    // 		console.log(albumsId[i]);
-	   //  	Facebook.api(
-	   //  		'/'+albumsId[i].id+'/picture',
-	   //  		function(response){
-	   //  			if (response && !response.error) {
-			 //    		//$scope.albums[i].photo = response.data.url;
-			 //        	console.log(response.data.url);
-		  //   		}
-	   //  		})
-	   //  }
-    // };
     
 
 
@@ -157,14 +142,10 @@ var ModalInstanceCtrl = function ($scope, $modalInstance, items, Facebook) {
     function (response) {
     	console.log(response.data);
 	    if (response && !response.error) {
-	    	
 	        $scope.comments = response.data;
 	    }  
     }
 	);
-  // $scope.ok = function () {
-  //   $modalInstance.close($scope.selected.item);
-  // };
 
   $scope.cancel = function () {
     $modalInstance.dismiss('cancel');
