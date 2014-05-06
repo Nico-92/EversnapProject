@@ -65,7 +65,6 @@ angular.module('eversnapApp')
 
     /* Loads the photo of an album, and change tab fromalbums to photos*/
     $scope.loadPhoto = function(albumId, albumName){
-    	console.log(albumId);
     	Facebook.api(
 	    '/'+albumId+'/photos',
 	    function (response) {
